@@ -9,8 +9,11 @@ export default {
 	theme: {
 		extend: {
 			colors: {
-				primary: colors[process.env.PUBLIC_APP_COLOR],
-			},
+				transparent: 'transparent',
+				current: '#e0e7ff',
+				'white': '#e0e7ff',
+				light: '#e0e7ff',
+		},
 			fontSize: {
 				xxs: "0.625rem",
 				smd: "0.94rem",

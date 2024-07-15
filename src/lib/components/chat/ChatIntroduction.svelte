@@ -65,14 +65,14 @@
 								alt=""
 							/>
 						{:else}
-							<div class="size-4 rounded border border-transparent bg-gray-300 dark:bg-gray-800" />
+							<div class="size-4 rounded border border-transparent bg-indigo-300 dark:bg-gray-800" />
 						{/if}
 						{currentModel.displayName}
 					</div>
 				</div>
 				<a
 					href="{base}/settings/{currentModel.id}"
-					class="btn ml-auto flex h-7 w-7 self-start rounded-full bg-gray-100 p-1 text-xs hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:hover:bg-gray-600"
+					class="btn ml-auto flex h-7 w-7 self-start rounded-full bg-indigo-200 p-1 text-xs hover:bg-indigo-50 dark:border-gray-600 dark:bg-gray-800 dark:hover:bg-gray-600"
 					><IconGear /></a
 				>
 			</div>
@@ -86,7 +86,7 @@
 				{#each currentModelMetadata.promptExamples as example}
 					<button
 						type="button"
-						class="rounded-xl border bg-gray-50 p-3 text-gray-600 hover:bg-gray-100 dark:border-gray-800 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 max-xl:text-sm xl:p-3.5"
+						class="rounded-xl border bg-indigo-200 p-3 border-indigo-200 text-gray-600 hover:bg-indigo-50 max-xl:text-sm xl:p-3.5 dark:border-gray-800 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
 						on:click={() => dispatch("message", example.prompt)}
 					>
 						{example.title}

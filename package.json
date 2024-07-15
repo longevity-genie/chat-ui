@@ -4,6 +4,7 @@
 	"private": true,
 	"packageManager": "npm@9.5.0",
 	"scripts": {
+		"prod": "vite --host",
 		"dev": "vite dev",
 		"build": "vite build",
 		"preview": "vite preview",
