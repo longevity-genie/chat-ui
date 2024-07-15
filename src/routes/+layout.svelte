@@ -155,7 +155,7 @@
 	<link
 		rel="icon"
 		href="{envPublic.PUBLIC_ORIGIN ||
-			$page.url.origin}{base}/{envPublic.PUBLIC_APP_ASSETS}/icon.svg"
+			$page.url.origin}{base}/{envPublic.PUBLIC_APP_ASSETS}/icon.png"
 		type="image/svg+xml"
 	/>
 	<link
