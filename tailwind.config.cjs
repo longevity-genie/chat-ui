@@ -10,9 +10,9 @@ export default {
 		extend: {
 			colors: {
 				transparent: 'transparent',
-				current: '#e0e7ff',
-				'white': '#e0e7ff',
-				light: '#e0e7ff',
+				current: '#d1fae5',
+				'white': '#d1fae5',
+				light: '#d1fae5',
 		},
 			fontSize: {
 				xxs: "0.625rem",
