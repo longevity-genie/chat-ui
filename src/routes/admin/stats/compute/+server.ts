@@ -3,7 +3,7 @@ import { logger } from "$lib/server/logger";
 import { computeAllStats } from "$lib/jobs/refresh-conversation-stats";
 
 // Triger like this:
-// curl -X POST "http://localhost:5174/chat/admin/stats/compute" -H "Authorization: Bearer <ADMIN_API_SECRET>"
+// curl -X POST "http://localhost:5175/chat/admin/stats/compute" -H "Authorization: Bearer <ADMIN_API_SECRET>"
 
 export async function POST() {
 	computeAllStats().catch((e) => logger.error(e));

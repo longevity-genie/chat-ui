@@ -10,7 +10,7 @@ import { z } from "zod";
 import { logger } from "$lib/server/logger.js";
 
 // Triger like this:
-// curl -X POST "http://localhost:5174/chat/admin/export" -H "Authorization: Bearer <ADMIN_API_SECRET>" -H "Content-Type: application/json" -d '{"model": "OpenAssistant/oasst-sft-6-llama-30b-xor"}'
+// curl -X POST "http://localhost:5175/chat/admin/export" -H "Authorization: Bearer <ADMIN_API_SECRET>" -H "Content-Type: application/json" -d '{"model": "OpenAssistant/oasst-sft-6-llama-30b-xor"}'
 
 export async function POST({ request }) {
 	if (!env.PARQUET_EXPORT_DATASET || !env.PARQUET_EXPORT_HF_TOKEN) {

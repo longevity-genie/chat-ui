@@ -928,7 +928,7 @@ The config file for HuggingChat is stored in the `chart/env/prod.yaml` file. It 
 
 If you want to run an exact copy of HuggingChat locally, you will need to do the following first:
 
-1. Create an [OAuth App on the hub](https://huggingface.co/settings/applications/new) with `openid profile email` permissions. Make sure to set the callback URL to something like `http://localhost:5174/chat/login/callback` which matches the right path for your local instance.
+1. Create an [OAuth App on the hub](https://huggingface.co/settings/applications/new) with `openid profile email` permissions. Make sure to set the callback URL to something like `http://localhost:5175/chat/login/callback` which matches the right path for your local instance.
 2. Create a [HF Token](https://huggingface.co/settings/tokens) with your Hugging Face account. You will need a Pro account to be able to access some of the larger models available through HuggingChat.
 3. Create a free account with [serper.dev](https://serper.dev/) (you will get 2500 free search queries)
 4. Run an instance of mongoDB, however you want. (Local or remote)
