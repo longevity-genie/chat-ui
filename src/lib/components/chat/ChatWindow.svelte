@@ -27,6 +27,7 @@
 	import AssistantIntroduction from "./AssistantIntroduction.svelte";
 	import ChatMessage from "./ChatMessage.svelte";
 	import ScrollToBottomBtn from "../ScrollToBottomBtn.svelte";
+	import ScrollToPreviousBtn from "../ScrollToPreviousBtn.svelte";
 	import { browser } from "$app/environment";
 	import { snapScrollToBottom } from "$lib/actions/snapScrollToBottom";
 	import SystemPromptModal from "../SystemPromptModal.svelte";
@@ -35,6 +36,7 @@
 	import UploadedFile from "./UploadedFile.svelte";
 	import { useSettingsStore } from "$lib/stores/settings";
 	import type { ToolFront } from "$lib/types/Tool";
+	import ModelSwitch from "./ModelSwitch.svelte";
 
 	export let messages: Message[] = [];
 	export let loading = false;
@@ -279,6 +281,9 @@
 						on:vote
 						on:continue
 					/>
+					{#if isReadOnly}
+						<ModelSwitch {models} {currentModel} />
+					{/if}
 				</div>
 			{:else if pending}
 				<ChatMessage
@@ -324,8 +329,14 @@
 				/>
 			{/if}
 		</div>
+
+		<ScrollToPreviousBtn
+			class="fixed right-4 max-md:bottom-[calc(50%+26px)] md:bottom-48 lg:right-10"
+			scrollNode={chatContainer}
+		/>
+
 		<ScrollToBottomBtn
-			class="bottom-36 right-4 max-md:hidden lg:right-10"
+			class="fixed right-4 max-md:bottom-[calc(50%-26px)] md:bottom-36 lg:right-10"
 			scrollNode={chatContainer}
 		/>
 	</div>
@@ -403,9 +414,7 @@
 							<ChatInput value="Sorry, something went wrong. Please try again." disabled={true} />
 						{:else}
 							<ChatInput
-								placeholder={isReadOnly
-									? "This conversation is read-only. Start a new one to continue!"
-									: "Ask anything"}
+								placeholder={isReadOnly ? "This conversation is read-only." : "Ask anything"}
 								bind:value={message}
 								on:submit={handleSubmit}
 								on:beforeinput={(ev) => {
