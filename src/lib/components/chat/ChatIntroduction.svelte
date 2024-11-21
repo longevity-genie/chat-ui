@@ -69,7 +69,6 @@
 					><IconGear /></a
 				>
 			</div>
-			<ModelCardMetadata variant="dark" model={currentModel} />
 		</div>
 	</div>
 	{#if currentModel.promptExamples}
