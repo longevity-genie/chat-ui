@@ -233,7 +233,7 @@
 	});
 	$: activeMimeTypes = [
 		...(currentModel.tools ? activeTools.flatMap((tool: ToolFront) => tool.mimeTypes ?? []) : []),
-		...(currentModel.multimodal ? currentModel.multimodalAcceptedMimetypes ?? ["image/*"] : []),
+		...(currentModel.multimodal ? currentModel.multimodalAcceptedMimetypes ?? ["*"] : []),
 	];
 
 	$: isFileUploadEnabled = activeMimeTypes.length > 0;

@@ -16,6 +16,17 @@ import type { MessageFile } from "$lib/types/Message";
 import { type Tool } from "$lib/types/Tool";
 import type { EndpointMessage } from "../endpoints";
 import { v4 as uuidv4 } from "uuid";
+import { createHash } from "crypto";
+
+interface FileParam {
+	name: string;
+	mime: string;
+	content: string;
+	checksum: string;
+}
+
+let fileParams: FileParam[] = [];
+
 function createChatCompletionToolsArray(tools: Tool[] | undefined): ChatCompletionTool[] {
 	const toolChoices = [] as ChatCompletionTool[];
 	if (tools === undefined) {
@@ -187,6 +198,7 @@ export async function endpointOai(
 			toolResults,
 			conversationId,
 		}) => {
+			fileParams = [];
 			let messagesOpenAI: OpenAI.Chat.Completions.ChatCompletionMessageParam[] =
 				await prepareMessages(messages, imageProcessor, !model.tools && model.multimodal);
 
@@ -249,7 +261,7 @@ export async function endpointOai(
 			};
 
 			const openChatAICompletion = await openai.chat.completions.create(body, {
-				body: { ...body, ...extraBody },
+				body: { ...body, ...extraBody, file_params: fileParams },
 				headers: {
 					"ChatUI-Conversation-ID": conversationId?.toString() ?? "",
 				},
@@ -293,6 +305,27 @@ async function prepareFiles(
 	const processedFiles = await Promise.all(
 		files.filter((file) => file.mime.startsWith("image/")).map(imageProcessor)
 	);
+
+	/**
+	 * For files that are not images, we need to append the file content to the chat completion.
+	 * To do that we add to an extra body the file name, the file content in base64 encoding, and the file checksum.
+	 *
+	 * The file name is the name of the file uploaded by the user.
+	 * The file content is the content of the file uploaded by the user encoded in base64.
+	 * The file checksum is the SHA256 checksum of the base64 encoded content of the file.
+	 */
+
+	files
+		.filter((file) => !file.mime.startsWith("image/"))
+		.forEach((file) => {
+			fileParams.push({
+				name: file.name,
+				mime: file.mime,
+				content: file.value,
+				checksum: createHash("sha256").update(file.value).digest("hex"),
+			});
+		});
+
 	return processedFiles.map((file) => ({
 		type: "image_url" as const,
 		image_url: {
