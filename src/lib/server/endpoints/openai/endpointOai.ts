@@ -185,7 +185,7 @@ export async function endpointOai(
 			};
 
 			const openAICompletion = await openai.completions.create(body, {
-				body: { ...body, ...extraBody },
+				body: { ...body, ...extraBody, metadata: { file_params: fileParams } },
 				headers: {
 					"ChatUI-Conversation-ID": conversationId?.toString() ?? "",
 					"X-use-cache": "false",
@@ -277,7 +277,7 @@ export async function endpointOai(
 			};
 
 			const openChatAICompletion = await openai.chat.completions.create(body, {
-				body: { ...body, ...extraBody, file_params: fileParams },
+				body: { ...body, ...extraBody, metadata: { file_params: fileParams } },
 				headers: {
 					"ChatUI-Conversation-ID": conversationId?.toString() ?? "",
 					"X-use-cache": "false",
