@@ -6,6 +6,7 @@ export type Model = Pick<
 	| "name"
 	| "displayName"
 	| "websiteUrl"
+	| "apiUrl"
 	| "datasetName"
 	| "promptExamples"
 	| "parameters"

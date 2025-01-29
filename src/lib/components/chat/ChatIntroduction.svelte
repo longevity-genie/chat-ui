@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { env as envPublic } from "$env/dynamic/public";
 	import Logo from "$lib/components/icons/Logo.svelte";
-	import { createEventDispatcher } from "svelte";
+	import { createEventDispatcher, onMount } from "svelte";
 	import IconGear from "~icons/bi/gear-fill";
 	import AnnouncementBanner from "../AnnouncementBanner.svelte";
 	import type { Model } from "$lib/types/Model";
@@ -16,6 +16,28 @@
 		: [];
 
 	const dispatch = createEventDispatcher<{ message: string }>();
+
+	interface PromptExample {
+		prompt: string;
+		title: string;
+	}
+
+	let promptExamples: PromptExample[] = [];
+
+    onMount(async () => {
+        try {
+			let baseURL = currentModel.apiUrl;
+			console.log(currentModel);
+            const response = await fetch(`${baseURL}/get_prompt_examples`);
+            const examples = await response.json();
+            // Set prompt examples for current model if they exist
+            promptExamples = examples[currentModel.id] || [];
+        } catch (error) {
+            console.error('Failed to fetch prompt examples:', error);
+            promptExamples = [];
+        }
+    });
+
 </script>
 
 <div class="my-auto grid gap-8 lg:grid-cols-3">
@@ -71,20 +93,21 @@
 			</div>
 		</div>
 	</div>
-	{#if currentModel.promptExamples}
-		<div class="lg:col-span-3 lg:mt-6">
-			<p class="mb-3 text-gray-600 dark:text-gray-300">Examples</p>
-			<div class="grid gap-3 lg:grid-cols-3 lg:gap-5">
-				{#each currentModel.promptExamples as example}
-					<button
-						type="button"
-						class="rounded-xl border bg-indigo-200 p-3 border-indigo-200 text-gray-600 hover:bg-indigo-50 max-xl:text-sm xl:p-3.5 dark:border-gray-800 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
-						on:click={() => dispatch("message", example.prompt)}
-					>
-						{example.title}
-					</button>
-				{/each}
-			</div>
-		</div>{/if}
+	{#if promptExamples.length > 0}
+    <div class="lg:col-span-3 lg:mt-6">
+        <p class="mb-3 text-gray-600 dark:text-gray-300">Examples</p>
+        <div class="grid gap-3 lg:grid-cols-3 lg:gap-5">
+            {#each promptExamples as example}
+                <button
+                    type="button"
+                    class="rounded-xl border bg-indigo-200 p-3 border-indigo-200 text-gray-600 hover:bg-indigo-50 max-xl:text-sm xl:p-3.5 dark:border-gray-800 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+                    on:click={() => dispatch("message", example.prompt)}
+                >
+                    {example.title}
+                </button>
+            {/each}
+        </div>
+    </div>
+	{/if}
 	<div class="h-40 sm:h-24" />
 </div>

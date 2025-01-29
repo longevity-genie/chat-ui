@@ -19,6 +19,7 @@ const modelConfig = z.object({
 	displayName: z.string().min(1).optional(),
 	description: z.string().min(1).optional(),
 	websiteUrl: z.string().url().optional(),
+	apiUrl: z.string().url().optional(),
 	modelUrl: z.string().url().optional(),
 	endpoints: z.array(embeddingEndpointSchema).nonempty(),
 	chunkCharLength: z.number().positive(),
