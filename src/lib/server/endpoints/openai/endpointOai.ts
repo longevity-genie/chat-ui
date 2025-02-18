@@ -276,13 +276,25 @@ export async function endpointOai(
 				...(toolCallChoices.length > 0 ? { tools: toolCallChoices, tool_choice: "auto" } : {}),
 			};
 
-			const openChatAICompletion = await openai.chat.completions.create(body, {
-				body: { ...body, ...extraBody, metadata: { file_params: fileParams } },
-				headers: {
-					"ChatUI-Conversation-ID": conversationId?.toString() ?? "",
-					"X-use-cache": "false",
-				},
-			});
+			let openChatAICompletion;
+
+			if (fileParams.length > 0) {
+				openChatAICompletion = await openai.chat.completions.create(body, {
+					body: { ...body, ...extraBody, metadata: { file_params: fileParams } },
+					headers: {
+						"ChatUI-Conversation-ID": conversationId?.toString() ?? "",
+						"X-use-cache": "false",
+					},
+				});
+			} else {
+				openChatAICompletion = await openai.chat.completions.create(body, {
+					body: { ...body, ...extraBody },
+					headers: {
+						"ChatUI-Conversation-ID": conversationId?.toString() ?? "",
+						"X-use-cache": "false",
+					},
+				});
+			}
 
 			return openAIChatToTextGenerationStream(openChatAICompletion);
 		};
