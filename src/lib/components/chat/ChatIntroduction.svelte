@@ -3,13 +3,17 @@
 	import Logo from "$lib/components/icons/Logo.svelte";
 	import { createEventDispatcher, onMount } from "svelte";
 	import IconGear from "~icons/bi/gear-fill";
-	import AnnouncementBanner from "../AnnouncementBanner.svelte";
 	import type { Model } from "$lib/types/Model";
 	import ModelCardMetadata from "../ModelCardMetadata.svelte";
 	import { base } from "$app/paths";
 	import JSON5 from "json5";
 
 	export let currentModel: Model;
+
+	let var_promptExamples: PromptExample[] = [];
+	if (currentModel.promptExamples) {
+		var_promptExamples = currentModel.promptExamples;
+	}
 
 	const announcementBanners = envPublic.PUBLIC_ANNOUNCEMENT_BANNERS
 		? JSON5.parse(envPublic.PUBLIC_ANNOUNCEMENT_BANNERS)
@@ -25,6 +29,7 @@
 	let promptExamples: PromptExample[] = [];
 
     onMount(async () => {
+		console.log("var_promptExamples", var_promptExamples);
         try {
 			let baseURL = currentModel.apiUrl;
 			console.log(currentModel);
@@ -32,11 +37,18 @@
             const examples = await response.json();
             // Set prompt examples for current model if they exist
             promptExamples = examples[currentModel.id] || [];
+			if (promptExamples.length > 0) {
+				var_promptExamples =  promptExamples;
+			}
+
         } catch (error) {
             console.error('Failed to fetch prompt examples:', error);
             promptExamples = [];
         }
+		console.log("var_promptExamples", var_promptExamples);
     });
+
+
 
 </script>
 
@@ -59,15 +71,6 @@
 		</div>
 	</div>
 	<div class="lg:col-span-2 lg:pl-24">
-		{#each announcementBanners as banner}
-			<AnnouncementBanner classNames="mb-4" title={banner.title}>
-				<a
-					target={banner.external ? "_blank" : "_self"}
-					href={banner.linkHref}
-					class="mr-2 flex items-center underline hover:no-underline">{banner.linkTitle}</a
-				>
-			</AnnouncementBanner>
-		{/each}
 		<div class="overflow-hidden rounded-xl border dark:border-gray-800">
 			<div class="flex p-3">
 				<div>
@@ -93,11 +96,13 @@
 			</div>
 		</div>
 	</div>
-	{#if promptExamples.length > 0}
+
+
     <div class="lg:col-span-3 lg:mt-6">
         <p class="mb-3 text-gray-600 dark:text-gray-300">Examples</p>
         <div class="grid gap-3 lg:grid-cols-3 lg:gap-5">
-            {#each promptExamples as example}
+
+            {#each var_promptExamples as example}
                 <button
                     type="button"
                     class="rounded-xl border bg-indigo-200 p-3 border-indigo-200 text-gray-600 hover:bg-indigo-50 max-xl:text-sm xl:p-3.5 dark:border-gray-800 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
@@ -108,6 +113,5 @@
             {/each}
         </div>
     </div>
-	{/if}
 	<div class="h-40 sm:h-24" />
 </div>
