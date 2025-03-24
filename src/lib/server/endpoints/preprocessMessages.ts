@@ -61,14 +61,31 @@ async function injectClipboardFiles(messages: EndpointMessage[]) {
 	return Promise.all(
 		messages.map((message) => {
 			const plaintextFiles = message.files
-				?.filter((file) => file.mime === "application/vnd.chatui.clipboard")
+				?.filter(
+					(file) =>
+						file.mime === "application/vnd.chatui.clipboard" ||
+						file.mime === "text/plain" ||
+						file.mime === "text/csv"
+				)
 				.map((file) => Buffer.from(file.value, "base64").toString("utf-8"));
 
 			if (!plaintextFiles || plaintextFiles.length === 0) return message;
 
 			return {
 				...message,
-				content: `${plaintextFiles.join("\n\n")}\n\n${message.content}`,
+				content: `This is the file or files that I want you to analize. Infer the file type from the mimetype "${message.files
+					?.filter(
+						(f) =>
+							f.mime === "application/vnd.chatui.clipboard" ||
+							f.mime === "text/plain" ||
+							f.mime === "text/csv"
+					)
+					.map((f) => f.mime)
+					.join(
+						", "
+					)}". Do not mention the mimetype in your response. The file contains the following data:\n\n${plaintextFiles
+					.map((f) => "```\n" + f + "\n```")
+					.join("\n\n")}\n\n${message.content}`,
 				files: message.files?.filter((file) => file.mime !== "application/vnd.chatui.clipboard"),
 			};
 		})
