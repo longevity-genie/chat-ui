@@ -78,7 +78,8 @@ async function injectClipboardFiles(messages: EndpointMessage[]) {
 						(f) =>
 							f.mime === "application/vnd.chatui.clipboard" ||
 							f.mime === "text/plain" ||
-							f.mime === "text/csv"
+							f.mime === "text/csv" ||
+							f.mime === "text/tsv"
 					)
 					.map((f) => f.mime)
 					.join(
