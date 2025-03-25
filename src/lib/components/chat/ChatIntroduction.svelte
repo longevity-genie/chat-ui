@@ -70,7 +70,13 @@
 			</p>
 		</div>
 	</div>
-	<div class="lg:col-span-2 lg:pl-24">
+	<div class="lg:col-span-2 lg:pl-24" >
+			<a
+				href="https://github.com/longevity-genie/just-chat"
+				class="mr-2 flex items-center underline hover:no-underline">
+				<strong>Support our project Just-Chat!</strong> 
+				</a>Make your LLM agent and chat with it simple and fast!
+
 		<div class="overflow-hidden rounded-xl border dark:border-gray-800">
 			<div class="flex p-3">
 				<div>
