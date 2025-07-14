@@ -13,8 +13,6 @@
 	}
 
 	let { classNames = "" }: Props = $props();
-
-  console.log("env var: " + PUBLIC_APP_ASSETS);
 </script>
 
 {#if PUBLIC_APP_ASSETS === "chatui"}

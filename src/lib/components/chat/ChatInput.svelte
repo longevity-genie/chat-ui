@@ -142,7 +142,7 @@
 
 	let showWebSearch = $derived(!assistant);
 	let showImageGen = $derived(modelHasTools && !assistant);
-	let showFileUpload = $derived((modelIsMultimodal || modelHasTools) && mimeTypes.length > 0);
+	let showFileUpload = $derived((modelIsMultimodal || modelHasTools) && mimeTypes.length > 0); // Should be true in order for files to be uploadable (depends on the model configuration)
 	let showExtraTools = $derived(modelHasTools && !assistant);
 
 	let showNoTools = $derived(!showWebSearch && !showImageGen && !showFileUpload && !showExtraTools);

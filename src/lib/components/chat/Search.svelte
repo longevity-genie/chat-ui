@@ -74,9 +74,10 @@
 	};
 
 	async function handleVisible(v: string) {
+    console.log("Starting search by " + v);
 		const newConvs = await client.conversations.search
 			.get({
-				query: {
+        query: { // ERROR IS HERE - 500: text index required for $text query
 					q: v,
 					p: page++,
 				},
