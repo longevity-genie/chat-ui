@@ -4,6 +4,7 @@
   import { page } from '$app/stores';
 
   import { PUBLIC_ORIGIN, PUBLIC_APP_NAME, PUBLIC_APP_ASSETS } from '$env/static/public';
+	import { base } from "$app/paths";
 
 	const publicConfig = usePublicConfig();
 
@@ -12,9 +13,11 @@
 	}
 
 	let { classNames = "" }: Props = $props();
+
+  console.log("env var: " + PUBLIC_APP_ASSETS);
 </script>
 
-{#if publicConfig.PUBLIC_APP_ASSETS === "chatui"}
+{#if PUBLIC_APP_ASSETS === "chatui"}
 	<svg
 		height="30"
 		width="30"
