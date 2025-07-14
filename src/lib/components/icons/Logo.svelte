@@ -3,6 +3,8 @@
 
   import { page } from '$app/stores';
 
+  import { PUBLIC_ORIGIN, PUBLIC_APP_NAME, PUBLIC_APP_ASSETS } from '$env/static/public';
+
 	const publicConfig = usePublicConfig();
 
 	interface Props {
@@ -28,7 +30,7 @@
 {:else}
 	<img
 		class={classNames}
-		alt="{envPublic.PUBLIC_APP_NAME} logo"
-		src="{envPublic.PUBLIC_ORIGIN || $page.url.origin}{base}/{envPublic.PUBLIC_APP_ASSETS}/logo.png"
+		alt="{PUBLIC_APP_NAME} logo"
+		src="{PUBLIC_ORIGIN || $page.url.origin}{base}/{PUBLIC_APP_ASSETS}/logo.png"
 	/>
 {/if}

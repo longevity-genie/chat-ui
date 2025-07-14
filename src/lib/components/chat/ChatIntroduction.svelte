@@ -3,29 +3,23 @@
 	import { createEventDispatcher, onMount } from "svelte";
 	import IconGear from "~icons/bi/gear-fill";
 	import type { Model } from "$lib/types/Model";
-	import ModelCardMetadata from "../ModelCardMetadata.svelte";
 	import { base } from "$app/paths";
-	import JSON5 from "json5";
 	import { usePublicConfig } from "$lib/utils/PublicConfig.svelte";
 
 	const publicConfig = usePublicConfig();
-
-  // [lg] Added prompt loading from .env file
-	let var_promptExamples: PromptExample[] = [];
-	if (currentModel.promptExamples) {
-		var_promptExamples = currentModel.promptExamples;
-	}
-  // [lg] -
-
-	const announcementBanners = envPublic.PUBLIC_ANNOUNCEMENT_BANNERS
-		? JSON5.parse(envPublic.PUBLIC_ANNOUNCEMENT_BANNERS)
-		: [];
 
 	interface Props {
 		currentModel: Model;
 	}
 
-	let { currentModel }: Props = $props();
+  let { currentModel } = $props<Props>();
+
+  // [lg] Added prompt loading from .env file
+	let var_promptExamples: PromptExample[] = $state([]);
+	if (currentModel.promptExamples) {
+		var_promptExamples = currentModel.promptExamples;
+	}
+  // [lg] -
 
 	const dispatch = createEventDispatcher<{ message: string }>();
 
@@ -101,7 +95,7 @@
 								alt=""
 							/>
 						{:else}
-							<div class="size-4 rounded border border-transparent bg-indigo-300 dark:bg-gray-800" />
+							<div class="size-4 rounded border border-transparent bg-indigo-300 dark:bg-gray-800"></div>
 						{/if}
 						{currentModel.displayName}
 					</div>
@@ -123,14 +117,14 @@
                 <button
                     type="button"
                     class="rounded-xl border bg-indigo-200 p-3 border-indigo-200 text-gray-600 hover:bg-indigo-50 max-xl:text-sm xl:p-3.5 dark:border-gray-800 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
-                    on:click={() => dispatch("message", example.prompt)}
+                    onclick={() => dispatch("message", example.prompt)}
                 >
                     {example.title}
                 </button>
             {/each}
         </div>
     </div>
-	<div class="h-40 sm:h-24" />
+	<div class="h-40 sm:h-24" ></div>
 
   <!-- Merge coflict with other branch -->
 
