@@ -1,12 +1,16 @@
 <script lang="ts">
-	import { page } from "$app/stores";
-	import { env as envPublic } from "$env/dynamic/public";
-	import { base } from "$app/paths";
+	import { usePublicConfig } from "$lib/utils/PublicConfig.svelte";
 
-	export let classNames = "";
+	const publicConfig = usePublicConfig();
+
+	interface Props {
+		classNames?: string;
+	}
+
+	let { classNames = "" }: Props = $props();
 </script>
 
-{#if envPublic.PUBLIC_APP_ASSETS === "chatui"}
+{#if publicConfig.PUBLIC_APP_ASSETS === "chatui"}
 	<svg
 		height="30"
 		width="30"
