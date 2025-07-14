@@ -122,7 +122,7 @@
 		<a
 			href={`${base}/`}
 			onclick={handleNewChatClick}
- 		  class="flex rounded-lg border bg-indigo-50 px-2 py-0.5 text-center shadow-sm hover:shadow-none dark:border-gray-600 dark:bg-gray-700" -->
+ 		  class="flex rounded-lg border bg-indigo-50 px-2 py-0.5 text-center shadow-sm hover:shadow-none dark:border-gray-600 dark:bg-gray-700"
 		>
 			New Chat
 		</a>

@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { usePublicConfig } from "$lib/utils/PublicConfig.svelte";
 
+  import { page } from '$app/stores';
+
 	const publicConfig = usePublicConfig();
 
 	interface Props {

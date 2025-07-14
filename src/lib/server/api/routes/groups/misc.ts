@@ -4,11 +4,14 @@ import { requiresUser } from "$lib/server/auth";
 import { collections } from "$lib/server/database";
 import { authCondition } from "$lib/server/auth";
 import { config } from "$lib/server/config";
-import { Client } from "@gradio/client";
 import yazl from "yazl";
 import { downloadFile } from "$lib/server/files/downloadFile";
 import mimeTypes from "mime-types";
 import { logger } from "$lib/server/logger";
+
+import { Client } from "@gradio/client";
+// export const importDynamic = new Function('modulePath', 'return import(modulePath)');
+// const { Client } = await importDynamic('@gradio/client');
 
 export interface FeatureFlags {
 	searchEnabled: boolean;
@@ -200,7 +203,7 @@ export const misc = new Elysia()
 													prompt: message.webSearch?.prompt,
 													searchQuery: message.webSearch?.searchQuery,
 													results: message.webSearch?.results.map((result) => result.link),
-											  }
+												}
 											: undefined,
 										files: filenames,
 										updates: undefined,

@@ -94,6 +94,16 @@ export default defineConfig({
 	optimizeDeps: {
 		include: ["uuid", "@huggingface/transformers", "sharp", "@gradio/client", "clsx"],
 	},
+	ssr: {
+		// don’t externalize @gradio/client in SSR build
+		noExternal: ["@gradio/client"],
+	},
+	resolve: {
+		// try browser-first, then module, then main
+		mainFields: ["browser", "module", "main"],
+		// accept more package.json “exports” conditions
+		conditions: ["browser", "import", "require"],
+	},
 	test: {
 		workspace: [
 			{

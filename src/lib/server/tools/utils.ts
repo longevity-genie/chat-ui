@@ -1,6 +1,10 @@
 import { config } from "$lib/server/config";
-import { Client } from "@gradio/client";
 import { SignJWT } from "jose";
+
+import { Client } from "@gradio/client";
+// export const importDynamic = new Function('modulePath', 'return import(modulePath)');
+// const { Client } = await importDynamic('@gradio/client');
+
 import JSON5 from "json5";
 import {
 	MessageToolUpdateType,
