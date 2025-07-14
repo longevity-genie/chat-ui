@@ -67,7 +67,7 @@
 								alt="{model.displayName} logo"
 							/>
 						{:else}
-							<div class="size-6 rounded border border-transparent bg-indigo-300 dark:bg-gray-800" aria-hidden="true"/>
+							<div class="size-6 rounded border border-transparent bg-indigo-300 dark:bg-gray-800" aria-hidden="true"></div>
 						{/if}
               {#if model.tools}
                 <span

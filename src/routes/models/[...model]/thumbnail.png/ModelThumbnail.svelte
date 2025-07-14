@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { env as envPublic } from "$env/dynamic/public";
 	import { page } from "$app/stores";
-	import { isHuggingChat } from "$lib/utils/isHuggingChat";
 	import { base } from "$app/paths";
 
 	import { usePublicConfig } from "$lib/utils/PublicConfig.svelte";
