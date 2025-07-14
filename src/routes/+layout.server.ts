@@ -207,7 +207,7 @@ export const load: LayoutServerLoad = async ({ locals, depends, fetch }) => {
 			id: model.id,
 			name: model.name,
 			websiteUrl: model.websiteUrl,
-			apiUrl: model.endpoints?.[0]?.baseURL,
+			apiUrl: model.endpoints?.[0]?.baseURL, // [lg] Added prompt downloading
 			modelUrl: model.modelUrl,
 			tokenizer: model.tokenizer,
 			datasetName: model.datasetName,

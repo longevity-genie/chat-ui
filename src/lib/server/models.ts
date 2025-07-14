@@ -41,7 +41,7 @@ const modelConfig = z.object({
 	description: z.string().min(1).optional(),
 	logoUrl: z.string().url().optional(),
 	websiteUrl: z.string().url().optional(),
-	apiUrl: z.string().url().optional(),
+	apiUrl: z.string().url().optional(), // [lg] Added prompt downloading
 	modelUrl: z.string().url().optional(),
 	tokenizer: z
 		.union([

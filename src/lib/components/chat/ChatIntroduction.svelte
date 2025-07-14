@@ -10,10 +10,12 @@
 
 	export let currentModel: Model;
 
+  // [lg] Added prompt loading from .env file
 	let var_promptExamples: PromptExample[] = [];
 	if (currentModel.promptExamples) {
 		var_promptExamples = currentModel.promptExamples;
 	}
+  // [lg] -
 
 	const announcementBanners = envPublic.PUBLIC_ANNOUNCEMENT_BANNERS
 		? JSON5.parse(envPublic.PUBLIC_ANNOUNCEMENT_BANNERS)
@@ -21,6 +23,7 @@
 
 	const dispatch = createEventDispatcher<{ message: string }>();
 
+  // [lg] Added prompt downloading from server
 	interface PromptExample {
 		prompt: string;
 		title: string;
@@ -37,7 +40,7 @@
             const examples = await response.json();
             // Set prompt examples for current model if they exist
             promptExamples = examples[currentModel.id] || [];
-			if (promptExamples.length > 0) {
+			if (promptExamples.length > 0) { // [lg] Added prompt loading from .env file
 				var_promptExamples =  promptExamples;
 			}
 
@@ -47,8 +50,7 @@
         }
 		console.log("var_promptExamples", var_promptExamples);
     });
-
-
+  // [lg] -
 
 </script>
 
@@ -70,12 +72,16 @@
 			</p>
 		</div>
 	</div>
+  <!-- [lg] Removed Chat Introduction Model -->
+
+  <!-- [lg] Added just-chat promotion link -->
 	<div class="lg:col-span-2 lg:pl-24" >
 			<a
 				href="https://github.com/longevity-genie/just-chat"
 				class="mr-2 flex items-center underline hover:no-underline">
 				<strong>Support our project Just-Chat!</strong> 
 				</a>Make your LLM agent and chat with it simple and fast!
+    <!-- [lg] - -->
 
 		<div class="overflow-hidden rounded-xl border dark:border-gray-800">
 			<div class="flex p-3">

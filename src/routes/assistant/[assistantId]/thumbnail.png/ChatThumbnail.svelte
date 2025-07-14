@@ -17,6 +17,8 @@
 		<div class="ml-10 flex flex-col items-start">
 			<p class="mb-2 mt-0 text-3xl font-normal text-gray-400">
 				<span class="mr-1.5 h-8 w-8">
+          <!-- [lg] Updated with custom logo + bugfixes -->
+
 					<!-- eslint-disable-next-line -->
 					{#if envPublic.PUBLIC_APP_ASSETS === "chatui"}
 						<svg
@@ -36,6 +38,7 @@
 							src="{envPublic.PUBLIC_ORIGIN || $page.url.origin}{base}/{envPublic.PUBLIC_APP_ASSETS}/logo.png"
 						/>
 					{/if}
+          <!-- [lg] - -->
 				</span>
 				AI assistant
 			</p>

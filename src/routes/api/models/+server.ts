@@ -7,7 +7,7 @@ export async function GET() {
 			id: model.id,
 			name: model.name,
 			websiteUrl: model.websiteUrl ?? "https://huggingface.co",
-			apiUrl: model.apiUrl ?? "https://huggingface.co",
+			apiUrl: model.apiUrl ?? "https://huggingface.co", // [lg] Added prompt downloading
 			modelUrl: model.modelUrl ?? "https://huggingface.co",
 			tokenizer: model.tokenizer,
 			datasetName: model.datasetName,

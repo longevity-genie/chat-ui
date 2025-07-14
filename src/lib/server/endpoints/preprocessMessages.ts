@@ -65,12 +65,13 @@ async function injectClipboardFiles(messages: EndpointMessage[]) {
 					(file) =>
 						file.mime === "application/vnd.chatui.clipboard" ||
 						file.mime === "text/plain" ||
-						file.mime === "text/csv"
+						file.mime === "text/csv" // [lg] Added csv support
 				)
 				.map((file) => Buffer.from(file.value, "base64").toString("utf-8"));
 
 			if (!plaintextFiles || plaintextFiles.length === 0) return message;
 
+			// [lg] Added csv support
 			return {
 				...message,
 				content: `This is the file or files that I want you to analize. Infer the file type from the mimetype "${message.files
@@ -79,7 +80,7 @@ async function injectClipboardFiles(messages: EndpointMessage[]) {
 							f.mime === "application/vnd.chatui.clipboard" ||
 							f.mime === "text/plain" ||
 							f.mime === "text/csv" ||
-							f.mime === "text/tsv"
+							f.mime === "text/tsv" // [lg] Added tsv support
 					)
 					.map((f) => f.mime)
 					.join(
@@ -89,6 +90,7 @@ async function injectClipboardFiles(messages: EndpointMessage[]) {
 					.join("\n\n")}\n\n${message.content}`,
 				files: message.files?.filter((file) => file.mime !== "application/vnd.chatui.clipboard"),
 			};
+			// [lg] -
 		})
 	);
 }

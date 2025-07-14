@@ -234,7 +234,7 @@
 		new Set([
 			...mimeTypesFromActiveTools, // fetch mime types from active tools either from tool settings or active assistant
 			...(currentModel.tools && !$page.data.assistant ? ["application/pdf"] : []), // if its a tool model, we can always enable document parser so we always accept pdfs
-			...(currentModel.multimodal ? currentModel.multimodalAcceptedMimetypes ?? ["*"] : []), // if its a multimodal model, we always accept images (changed to accept all mime types for LongevityGenie project)	
+			...(currentModel.multimodal ? currentModel.multimodalAcceptedMimetypes ?? ["*"] : []), // if its a multimodal model, we always accept images ( [lg] changed to accept all mime types for LongevityGenie project)	
 		])
 	);
 	$: isFileUploadEnabled = activeMimeTypes.length > 0;

@@ -18,6 +18,7 @@ import type { EndpointMessage } from "../endpoints";
 import { v4 as uuidv4 } from "uuid";
 import { createHash } from "crypto";
 
+// [lg] Added file upload to our server
 interface FileParam {
 	name: string;
 	mime: string;
@@ -26,6 +27,7 @@ interface FileParam {
 }
 
 let fileParams: FileParam[] = [];
+// [lg] -
 
 function createChatCompletionToolsArray(tools: Tool[] | undefined): ChatCompletionTool[] {
 	const toolChoices = [] as ChatCompletionTool[];
@@ -185,7 +187,7 @@ export async function endpointOai(
 			};
 
 			const openAICompletion = await openai.completions.create(body, {
-				body: { ...body, ...extraBody, metadata: { file_params: fileParams } },
+				body: { ...body, ...extraBody, metadata: { file_params: fileParams } }, // [lg] Added metadata field
 				headers: {
 					"ChatUI-Conversation-ID": conversationId?.toString() ?? "",
 					"X-use-cache": "false",
@@ -203,7 +205,7 @@ export async function endpointOai(
 			toolResults,
 			conversationId,
 		}) => {
-			fileParams = [];
+			fileParams = []; // [lg] Added file upload
 			let messagesOpenAI: OpenAI.Chat.Completions.ChatCompletionMessageParam[] =
 				await prepareMessages(messages, imageProcessor, !model.tools && model.multimodal);
 
@@ -259,7 +261,7 @@ export async function endpointOai(
 				messagesOpenAI.push(...responses);
 			}
 
-			const parameters = { ...model.parameters, ...generateSettings };
+			const parameters = { ...model.parameters, ...generateSettings }; // [lg] Added file upload
 			const toolCallChoices = createChatCompletionToolsArray(tools);
 			const body: ChatCompletionCreateParamsStreaming = {
 				model: model.id ?? model.name,
@@ -276,11 +278,12 @@ export async function endpointOai(
 				...(toolCallChoices.length > 0 ? { tools: toolCallChoices, tool_choice: "auto" } : {}),
 			};
 
+			// [lg] Conditionally remove metadata field
 			let openChatAICompletion;
 
 			if (fileParams.length > 0) {
 				openChatAICompletion = await openai.chat.completions.create(body, {
-					body: { ...body, ...extraBody, metadata: { file_params: fileParams } },
+					body: { ...body, ...extraBody, metadata: { file_params: fileParams } }, // [lg] Added metadata field
 					headers: {
 						"ChatUI-Conversation-ID": conversationId?.toString() ?? "",
 						"X-use-cache": "false",
@@ -295,6 +298,7 @@ export async function endpointOai(
 					},
 				});
 			}
+			// [lg] -
 
 			return openAIChatToTextGenerationStream(openChatAICompletion);
 		};
@@ -335,6 +339,7 @@ async function prepareFiles(
 		files.filter((file) => file.mime.startsWith("image/")).map(imageProcessor)
 	);
 
+	// [lg] Added file upload to our server
 	/**
 	 * For files that are not images, we need to append the file content to the chat completion.
 	 * To do that we add to an extra body the file name, the file content in base64 encoding, and the file checksum.
@@ -354,6 +359,7 @@ async function prepareFiles(
 				checksum: createHash("sha256").update(file.value).digest("hex"),
 			});
 		});
+	// [lg] -
 
 	return processedFiles.map((file) => ({
 		type: "image_url" as const,

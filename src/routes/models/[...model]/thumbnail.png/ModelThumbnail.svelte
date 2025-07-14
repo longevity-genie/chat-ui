@@ -31,6 +31,8 @@
 		{#if isHuggingChat}
 			<div class="flex flex-row pt-3 text-5xl font-bold text-black">
 				<div class="mr-5 flex items-center justify-center" id="logo">
+          <!-- [lg] Updated with custom logo + bugfixes -->
+
 					<!-- eslint-disable-next-line -->
 					{#if envPublic.PUBLIC_APP_ASSETS === "chatui"}
 						<svg
@@ -50,6 +52,7 @@
 							src="{envPublic.PUBLIC_ORIGIN || $page.url.origin}{base}/{envPublic.PUBLIC_APP_ASSETS}/logo.png"
 						/>
 					{/if}
+          <!-- [lg] - -->
 				</div>
 				<span>HuggingChat</span>
 			</div>

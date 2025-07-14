@@ -218,7 +218,7 @@ export async function POST({ request, locals, params, getClientAddress }) {
 	// check sizes
 	// todo: make configurable
 	if (b64Files.some((file) => file.size > 100 * 1024 * 1024)) {
-		error(413, "File too large, should be <100MB");
+		error(413, "File too large, should be <100MB"); // [lg] Added file upload - increased max file size
 	}
 
 	const uploadedFiles = await Promise.all(b64Files.map((file) => uploadFile(file, conv))).then(
