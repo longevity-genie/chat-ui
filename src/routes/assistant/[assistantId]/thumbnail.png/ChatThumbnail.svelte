@@ -1,12 +1,16 @@
 <script lang="ts">
-	export let name: string;
-	export let description: string = "";
-	export let createdByName: string | undefined;
-	export let avatar: string | undefined;
-
 	import { page } from "$app/stores";
 	import { env as envPublic } from "$env/dynamic/public";
 	import { base } from "$app/paths";
+
+	interface Props {
+		name: string;
+		description?: string;
+		createdByName: string | undefined;
+		avatar: string | undefined;
+	}
+
+	let { name, description = "", createdByName, avatar }: Props = $props();
 </script>
 
 <div class="flex h-full w-full flex-col items-center justify-center bg-black p-2">
@@ -17,6 +21,8 @@
 		<div class="ml-10 flex flex-col items-start">
 			<p class="mb-2 mt-0 text-3xl font-normal text-gray-400">
 				<span class="mr-1.5 h-8 w-8">
+          <!-- [lg] Updated with custom logo + bugfixes -->
+
 					<!-- eslint-disable-next-line -->
 					{#if envPublic.PUBLIC_APP_ASSETS === "chatui"}
 						<svg
@@ -36,6 +42,7 @@
 							src="{envPublic.PUBLIC_ORIGIN || $page.url.origin}{base}/{envPublic.PUBLIC_APP_ASSETS}/logo.png"
 						/>
 					{/if}
+          <!-- [lg] - -->
 				</span>
 				AI assistant
 			</p>

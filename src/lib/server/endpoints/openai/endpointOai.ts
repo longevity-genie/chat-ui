@@ -1,14 +1,18 @@
 import { z } from "zod";
 import { openAICompletionToTextGenerationStream } from "./openAICompletionToTextGenerationStream";
-import { openAIChatToTextGenerationStream } from "./openAIChatToTextGenerationStream";
+import {
+	openAIChatToTextGenerationSingle,
+	openAIChatToTextGenerationStream,
+} from "./openAIChatToTextGenerationStream";
 import type { CompletionCreateParamsStreaming } from "openai/resources/completions";
 import type {
+	ChatCompletionCreateParamsNonStreaming,
 	ChatCompletionCreateParamsStreaming,
 	ChatCompletionTool,
 } from "openai/resources/chat/completions";
 import type { FunctionDefinition, FunctionParameters } from "openai/resources/shared";
 import { buildPrompt } from "$lib/buildPrompt";
-import { env } from "$env/dynamic/private";
+import { config } from "$lib/server/config";
 import type { Endpoint } from "../endpoints";
 import type OpenAI from "openai";
 import { createImageProcessorOptionsValidator, makeImageProcessor } from "../images";
@@ -18,6 +22,7 @@ import type { EndpointMessage } from "../endpoints";
 import { v4 as uuidv4 } from "uuid";
 import { createHash } from "crypto";
 
+// [lg] Added file upload to our server
 interface FileParam {
 	name: string;
 	mime: string;
@@ -26,6 +31,7 @@ interface FileParam {
 }
 
 let fileParams: FileParam[] = [];
+// [lg] -
 
 function createChatCompletionToolsArray(tools: Tool[] | undefined): ChatCompletionTool[] {
 	const toolChoices = [] as ChatCompletionTool[];
@@ -97,7 +103,7 @@ export const endpointOAIParametersSchema = z.object({
 	model: z.any(),
 	type: z.literal("openai"),
 	baseURL: z.string().url().default("https://api.openai.com/v1"),
-	apiKey: z.string().default(env.OPENAI_API_KEY || env.HF_TOKEN || "sk-"),
+	apiKey: z.string().default(config.OPENAI_API_KEY || config.HF_TOKEN || "sk-"),
 	completion: z
 		.union([z.literal("completions"), z.literal("chat_completions")])
 		.default("chat_completions"),
@@ -124,6 +130,7 @@ export const endpointOAIParametersSchema = z.object({
 		.default({}),
 	/* enable use of max_completion_tokens in place of max_tokens */
 	useCompletionTokens: z.boolean().default(false),
+	streamingSupported: z.boolean().default(true),
 });
 
 export async function endpointOai(
@@ -139,6 +146,7 @@ export async function endpointOai(
 		multimodal,
 		extraBody,
 		useCompletionTokens,
+		streamingSupported,
 	} = endpointOAIParametersSchema.parse(input);
 
 	let OpenAI;
@@ -185,7 +193,7 @@ export async function endpointOai(
 			};
 
 			const openAICompletion = await openai.completions.create(body, {
-				body: { ...body, ...extraBody, metadata: { file_params: fileParams } },
+				body: { ...body, ...extraBody, metadata: { file_params: fileParams } }, // [lg] Added metadata field
 				headers: {
 					"ChatUI-Conversation-ID": conversationId?.toString() ?? "",
 					"X-use-cache": "false",
@@ -203,26 +211,43 @@ export async function endpointOai(
 			toolResults,
 			conversationId,
 		}) => {
-			fileParams = [];
+			fileParams = []; // [lg] Added file upload
+			// Format messages for the chat API, handling multimodal content if supported
 			let messagesOpenAI: OpenAI.Chat.Completions.ChatCompletionMessageParam[] =
 				await prepareMessages(messages, imageProcessor, !model.tools && model.multimodal);
 
-			if (messagesOpenAI?.[0]?.role !== "system") {
-				messagesOpenAI = [{ role: "system", content: "" }, ...messagesOpenAI];
+			// Check if a system message already exists as the first message
+			const hasSystemMessage = messagesOpenAI.length > 0 && messagesOpenAI[0]?.role === "system";
+
+			if (hasSystemMessage) {
+				// System message exists - preserve user configuration
+				if (preprompt !== undefined) {
+					// Prepend preprompt to existing system message if preprompt exists
+					const userSystemPrompt = messagesOpenAI[0].content || "";
+					messagesOpenAI[0].content =
+						preprompt + (userSystemPrompt ? "\n\n" + userSystemPrompt : "");
+				}
+				// If no preprompt, user's system message remains unchanged
+			} else {
+				// No system message exists - create a new one with preprompt or empty string
+				messagesOpenAI = [{ role: "system", content: preprompt ?? "" }, ...messagesOpenAI];
 			}
 
-			if (messagesOpenAI?.[0]) {
-				messagesOpenAI[0].content = preprompt ?? "";
-			}
-
-			// if system role is not supported, convert first message to a user message.
-			if (!model.systemRoleSupported && messagesOpenAI?.[0]?.role === "system") {
+			// Handle models that don't support system role by converting to user message
+			// This maintains compatibility with older or non-standard models
+			if (
+				!model.systemRoleSupported &&
+				messagesOpenAI.length > 0 &&
+				messagesOpenAI[0]?.role === "system"
+			) {
 				messagesOpenAI[0] = {
 					...messagesOpenAI[0],
 					role: "user",
 				};
 			}
 
+			// Format tool results for the API to provide context for follow-up tool calls
+			// This creates the full conversation flow needed for multi-step tool interactions
 			if (toolResults && toolResults.length > 0) {
 				const toolCallRequests: OpenAI.Chat.Completions.ChatCompletionAssistantMessageParam = {
 					role: "assistant",
@@ -233,7 +258,7 @@ export async function endpointOai(
 				const responses: Array<OpenAI.Chat.Completions.ChatCompletionToolMessageParam> = [];
 
 				for (const result of toolResults) {
-					const id = uuidv4();
+					const id = result?.call?.toolId || uuidv4();
 
 					const toolCallResult: OpenAI.Chat.Completions.ChatCompletionMessageToolCall = {
 						type: "function",
@@ -259,12 +284,13 @@ export async function endpointOai(
 				messagesOpenAI.push(...responses);
 			}
 
-			const parameters = { ...model.parameters, ...generateSettings };
+			const parameters = { ...model.parameters, ...generateSettings }; // [lg] Added file upload
 			const toolCallChoices = createChatCompletionToolsArray(tools);
-			const body: ChatCompletionCreateParamsStreaming = {
+			const body = {
 				model: model.id ?? model.name,
 				messages: messagesOpenAI,
-				stream: true,
+				stream: streamingSupported,
+				// Support two different ways of specifying token limits depending on the model
 				...(useCompletionTokens
 					? { max_completion_tokens: parameters?.max_new_tokens }
 					: { max_tokens: parameters?.max_new_tokens }),
@@ -273,30 +299,44 @@ export async function endpointOai(
 				top_p: parameters?.top_p,
 				frequency_penalty: parameters?.repetition_penalty,
 				presence_penalty: parameters?.presence_penalty,
+				// Only include tool configuration if tools are provided
 				...(toolCallChoices.length > 0 ? { tools: toolCallChoices, tool_choice: "auto" } : {}),
 			};
 
-			let openChatAICompletion;
-
-			if (fileParams.length > 0) {
-				openChatAICompletion = await openai.chat.completions.create(body, {
-					body: { ...body, ...extraBody, metadata: { file_params: fileParams } },
-					headers: {
-						"ChatUI-Conversation-ID": conversationId?.toString() ?? "",
-						"X-use-cache": "false",
-					},
-				});
+			// Handle both streaming and non-streaming responses with appropriate processors
+			if (streamingSupported) {
+				const openChatAICompletion = await openai.chat.completions.create(
+					body as ChatCompletionCreateParamsStreaming,
+					{
+						body: {
+							...body,
+							...extraBody,
+							metadata: fileParams.length > 0 ? { file_params: fileParams } : undefined,
+						},
+						headers: {
+							"ChatUI-Conversation-ID": conversationId?.toString() ?? "",
+							"X-use-cache": "false",
+						},
+					}
+				);
+				return openAIChatToTextGenerationStream(openChatAICompletion);
 			} else {
-				openChatAICompletion = await openai.chat.completions.create(body, {
-					body: { ...body, ...extraBody },
-					headers: {
-						"ChatUI-Conversation-ID": conversationId?.toString() ?? "",
-						"X-use-cache": "false",
-					},
-				});
+				const openChatAICompletion = await openai.chat.completions.create(
+					body as ChatCompletionCreateParamsNonStreaming,
+					{
+						body: {
+							...body,
+							...extraBody,
+							metadata: fileParams.length > 0 ? { file_params: fileParams } : undefined,
+						},
+						headers: {
+							"ChatUI-Conversation-ID": conversationId?.toString() ?? "",
+							"X-use-cache": "false",
+						},
+					}
+				);
+				return openAIChatToTextGenerationSingle(openChatAICompletion);
 			}
-
-			return openAIChatToTextGenerationStream(openChatAICompletion);
 		};
 	} else {
 		throw new Error("Invalid completion type");
@@ -335,6 +375,7 @@ async function prepareFiles(
 		files.filter((file) => file.mime.startsWith("image/")).map(imageProcessor)
 	);
 
+	// [lg] Added file upload to our server
 	/**
 	 * For files that are not images, we need to append the file content to the chat completion.
 	 * To do that we add to an extra body the file name, the file content in base64 encoding, and the file checksum.
@@ -354,6 +395,7 @@ async function prepareFiles(
 				checksum: createHash("sha256").update(file.value).digest("hex"),
 			});
 		});
+	// [lg] -
 
 	return processedFiles.map((file) => ({
 		type: "image_url" as const,

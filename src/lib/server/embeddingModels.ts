@@ -1,4 +1,4 @@
-import { env } from "$env/dynamic/private";
+import { config } from "$lib/server/config";
 
 import { z } from "zod";
 import { sum } from "$lib/utils/sum";
@@ -19,7 +19,7 @@ const modelConfig = z.object({
 	displayName: z.string().min(1).optional(),
 	description: z.string().min(1).optional(),
 	websiteUrl: z.string().url().optional(),
-	apiUrl: z.string().url().optional(),
+	apiUrl: z.string().url().optional(), // [lg] Added prompt downloading
 	modelUrl: z.string().url().optional(),
 	endpoints: z.array(embeddingEndpointSchema).nonempty(),
 	chunkCharLength: z.number().positive(),
@@ -30,7 +30,7 @@ const modelConfig = z.object({
 
 // Default embedding model for backward compatibility
 const rawEmbeddingModelJSON =
-	env.TEXT_EMBEDDING_MODELS ||
+	config.TEXT_EMBEDDING_MODELS ||
 	`[
 	{
 	  "name": "Xenova/gte-small",

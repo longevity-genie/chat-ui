@@ -6,7 +6,7 @@ export type Model = Pick<
 	| "name"
 	| "displayName"
 	| "websiteUrl"
-	| "apiUrl"
+	| "apiUrl" // [lg] Added prompt downloading
 	| "datasetName"
 	| "promptExamples"
 	| "parameters"
